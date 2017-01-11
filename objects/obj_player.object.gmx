@@ -222,7 +222,7 @@ if (place_meeting(x+hsp, y, obj_wall)) // Check if will hit wall upon moving
             x += sign(hsp);
         }
         hsp = 0; // Prevent further horizontal movement on this step
-    }
+    }    
 }
 
 // Perform horizontal movement
@@ -237,11 +237,23 @@ if (keyboard_check_released(key_jump) &amp;&amp; !sign(vsp))
 // Vertical collision aka don't go through the floor/ceiling
 if (place_meeting(x, y+vsp, obj_wall)) // Check if will hit floor/ceiling upon moving
 {
-    while (!place_meeting(x, y+sign(vsp), obj_wall)) // Move 1 in current direction until further movement would collide with the floor/ceiling
+    var oWall = instance_place(x, y+vsp, obj_wall); //Obtain the collided wall
+    if(oWall.iType == obj_wall.WALLTYPE.iRegularWall) // Regular wall/slide
     {
-        y += sign(vsp);
+        while (!place_meeting(x, y+sign(vsp), obj_wall)) // Move 1 in current direction until further movement would collide with the floor/ceiling
+        {
+            y += sign(vsp);
+        }
+        vsp = 0; // Prevent further vertical movement on this step
     }
-    vsp = 0; // Prevent further vertical movement on this step
+    else if((oWall.iType == obj_wall.WALLTYPE.iPlatform) &amp;&amp; sign(vsp) == 1)
+    {
+        if(!place_meeting(x,y,obj_wall))
+        {
+            while(!place_meeting(x, y+sign(vsp), obj_wall)) y+=1;
+            //vsp = 0;
+        }
+    }
 }
 
 y += vsp; // Perform vertical movement
